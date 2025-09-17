@@ -26,12 +26,14 @@ dependencies = [
 
 [project.optional-dependencies]
 torch = ["torch"]
+mtsa = ["mtsa"]
 sklearn = ["scikit-learn"]
 tensorflow = ["tensorflow"]
 all = [
   "atelierflow[torch]",
   "atelierflow[sklearn]",
   "atelierflow[tensorflow]",
+  "atelierflow[mtsa]",
 ]
 
 [project.urls]

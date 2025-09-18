@@ -7,6 +7,8 @@ class Metric(ABC):
   This is a pure "component" used by evaluation steps to produce
   a numerical score.
   """
+  def __init__(self, name: str):
+    self.name = name
   
   @abstractmethod
   def compute(self, y_true, y_pred, **kwargs) -> float:

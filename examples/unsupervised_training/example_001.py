@@ -33,6 +33,9 @@ class MyIForest(Model):
     return self.model.score_samples(X)
   
 class AucRocMetric(Metric):
+  def __init__(self, name):
+    self.name=name
+
   def compute(self, y_true, y_pred) -> float:
     from sklearn.metrics import roc_auc_score
     return roc_auc_score(y_true, y_pred)
@@ -96,7 +99,7 @@ DATA_DIRECTORY = "/data/henrique/CBICEmbeddedAI/cooling-fans/dB0/A2/12V/config1c
 OUTPUT_FILE = "./anomaly_detection_results.avro"
 
 model_component = MyIForest()  
-metric_component = AucRocMetric()
+metric_component = AucRocMetric(name="AUC-ROC")
 
 # --- 2. Pipeline Assembly ---
 iforest_experiment = Experiment(name="Isolation Forest Anomaly Detection", logging_level="INFO")

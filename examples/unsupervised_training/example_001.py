@@ -49,11 +49,12 @@ class LoadAndSplitDataStep(Step):
     logging.info(f"Loading and splitting data from: {self.directory}")
     X_train, X_test, y_train, y_test = files_train_test_split(self.directory)
     logging.debug("Data loaded and split successfully.")
-    result = StepResult()
-    result.add('X_train', X_train)
-    result.add('X_test', X_test)
-    result.add('y_train', y_train)
-    result.add('y_test', y_test)
+    result = StepResult(
+      X_train = X_train,
+      X_test = X_test,
+      y_train = y_train,
+      y_test = y_test
+    )
     return result
   
 class TrainModelStep(Step):
@@ -63,14 +64,16 @@ class TrainModelStep(Step):
   def run(self, input_data: Optional[StepResult], experiment_config: Dict[str, Any]) -> StepResult:
     if not input_data: 
       raise ValueError("TrainModelStep requires input data.")
-    X_train, y_train = input_data.get('X_train'), input_data.get('y_train')
+    X_train, y_train = input_data.X_train, input_data.y_train
     logging.info(f"Fitting model '{self.model.__class__.__name__}'...")
     self.model.fit(X_train, y_train)
     logging.info("Model training complete.")
     result = StepResult()
-    result.add('model', self.model)
-    result.add('X_test', input_data.get('X_test'))
-    result.add('y_test', input_data.get('y_test'))
+    result = StepResult(
+      model = self.model,
+      X_train = X_train,
+      y_train = y_train,
+    )
     return result
   
 class EvaluateModelStep(Step):
@@ -89,8 +92,9 @@ class EvaluateModelStep(Step):
       logging.debug(f"Calculating metric: {metric_name}")
       score = metric.compute(y_test, y_pred)
       scores[metric_name] = score
-    result = StepResult()
-    result.add('evaluation_scores', scores)
+      result = StepResult(
+        evaluation_scores = scores
+    )
     return result
 
 

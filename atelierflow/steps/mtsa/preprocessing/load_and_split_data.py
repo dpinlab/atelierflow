@@ -39,9 +39,10 @@ class LoadAndSplitDataStep(Step):
     logging.info(f"Loading and splitting data from: {self.directory}")
     X_train, X_test, y_train, y_test = files_train_test_split(self.directory)
     logging.debug("Data loaded and split successfully.")
-    result = StepResult()
-    result.add('X_train', X_train)
-    result.add('X_test', X_test)
-    result.add('y_train', y_train)
-    result.add('y_test', y_test)
+    result = StepResult(
+      X_train=X_train,
+      X_test=X_test,
+      y_train=y_train,
+      y_test=y_test
+    )
     return result

@@ -116,5 +116,5 @@ iforest_experiment.add_step(
 final_results = iforest_experiment.run()
 
 print("\n--- Final Experiment Results ---")
-scores = final_results.get('cv_metrics')
+scores = final_results.cv_metrics
 print(scores)

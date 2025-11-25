@@ -64,15 +64,16 @@ class TrainModelStep(Step):
   def run(self, input_data: Optional[StepResult], experiment_config: Dict[str, Any]) -> StepResult:
     if not input_data: 
       raise ValueError("TrainModelStep requires input data.")
-    X_train, y_train = input_data.X_train, input_data.y_train
+    X_train, y_train, X_test, y_test = input_data.X_train, input_data.y_train, input_data.X_test, input_data.y_test
     logging.info(f"Fitting model '{self.model.__class__.__name__}'...")
     self.model.fit(X_train, y_train)
     logging.info("Model training complete.")
-    result = StepResult()
     result = StepResult(
       model = self.model,
       X_train = X_train,
       y_train = y_train,
+      X_test = X_test,
+      y_test = y_test
     )
     return result
   
@@ -83,7 +84,7 @@ class EvaluateModelStep(Step):
   def run(self, input_data: Optional[StepResult], experiment_config: Dict[str, Any]) -> StepResult:
     if not input_data: 
       raise ValueError("EvaluateModelStep requires input data.")
-    model, X_test, y_test = input_data.get('model'), input_data.get('X_test'), input_data.get('y_test')
+    model, X_test, y_test = input_data.model, input_data.X_test, input_data.y_test
     logging.info("Making predictions on the test set...")
     y_pred = model.score_samples(X_test)
     scores = {}
@@ -99,7 +100,7 @@ class EvaluateModelStep(Step):
 
 
 # --- 1. Configuration ---
-DATA_DIRECTORY = "/data/henrique/CBICEmbeddedAI/cooling-fans/dB0/A2/12V/config1config5"
+DATA_DIRECTORY = "/data/marcelo/atelierflow/examples/sample_data/machine_type_1/id_00"
 OUTPUT_FILE = "./anomaly_detection_results.avro"
 
 model_component = MyIForest()  
@@ -133,5 +134,5 @@ iforest_experiment.add_step(
 final_results = iforest_experiment.run()
 
 print("\n--- Final Experiment Results ---")
-scores = final_results.get('evaluation_scores')
+scores = final_results.evaluation_scores
 print(scores)

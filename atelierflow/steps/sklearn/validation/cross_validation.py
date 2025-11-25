@@ -26,10 +26,10 @@ class UnsupervisedCrossValidationStep(Step):
     self.n_splits = n_splits
 
   def run(self, input_data: Optional[StepResult], experiment_config: Dict[str, Any]):
-    X_train = input_data.get('X_train')
-    y_train = input_data.get('y_train') 
-    X_test = input_data.get('X_test')
-    y_test = input_data.get('y_test')
+    X_train = input_data.X_train
+    y_train = input_data.y_train 
+    X_test = input_data.X_test
+    y_test = input_data.y_test
 
     kf = KFold(n_splits=self.n_splits, shuffle=True, random_state=42)
     
@@ -82,8 +82,9 @@ class UnsupervisedCrossValidationStep(Step):
       }
       logger.info(f"Final {name}: {np.mean(scores):.4f} +/- {np.std(scores):.4f}")
 
-    result = StepResult()
-    result.add('cv_metrics', final_metrics)
-    result.add('X_test', X_test)
-    result.add('y_test', y_test)
+    result = StepResult(
+      cv_metrics=final_metrics,
+      X_test=X_test,
+      y_test=y_test
+    )
     return result

@@ -45,7 +45,7 @@ class SaveToAvroStep(Step):
     if not input_data:
       raise ValueError("SaveToAvroStep requires input data from a previous step.")
 
-    data_to_save = input_data.get(self.data_key)
+    data_to_save = getattr(input_data, self.data_key, None)
     if data_to_save is None:
       raise ValueError(f"Data key '{self.data_key}' not found in the previous StepResult.")
 

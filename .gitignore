@@ -6,3 +6,4 @@ atelier-env
 dist/
 
 *.egg-info/
+.python-version

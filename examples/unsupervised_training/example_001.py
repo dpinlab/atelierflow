@@ -36,9 +36,9 @@ class AucRocMetric(Metric):
   def __init__(self, name):
     self.name=name
 
-  def compute(self, y_true, y_pred) -> float:
+  def compute(self, **kwargs) -> float:
     from sklearn.metrics import roc_auc_score
-    return roc_auc_score(y_true, y_pred)
+    return roc_auc_score(kwargs)
   
 # --- Pipeline Steps ---
 class LoadAndSplitDataStep(Step):

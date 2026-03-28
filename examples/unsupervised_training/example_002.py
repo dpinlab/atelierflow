@@ -33,9 +33,9 @@ class AucRocMetric(Metric):
   def __init__(self, name):
     self.name=name
 
-  def compute(self, y_true, y_pred) -> float:
+  def compute(self, **kwargs) -> float:
     from sklearn.metrics import roc_curve, auc
-    fpr, tpr, thresholds = roc_curve(y_true, y_pred)
+    fpr, tpr, thresholds = roc_curve(kwargs)
     
     roc_auc = auc(fpr, tpr)
     

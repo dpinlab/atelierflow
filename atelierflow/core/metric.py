@@ -11,7 +11,7 @@ class Metric(ABC):
     self.name = name
   
   @abstractmethod
-  def compute(self, y_true, y_pred, **kwargs) -> float:
+  def compute(self, **kwargs) -> float:
     """
     Computes the metric and returns a single numerical value (float).
     """

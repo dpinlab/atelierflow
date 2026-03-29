@@ -58,7 +58,7 @@ class Experiment:
         """
         self.steps.append(step)
 
-    def run(self):
+    def run(self, input_data: StepResult = None):
         """
         Executes all steps in the pipeline in the order they were added.
 
@@ -72,6 +72,8 @@ class Experiment:
         logging.info(f"--- Starting Experiment: '{self.name}' ---")
         logging.info(f"Configuration: {self.config}")
         current_result: StepResult | None = None
+        if input_data:
+            current_result = input_data
 
         for i, step in enumerate(self.steps, 1):
             step_name = step.__class__.__name__

@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Generic, TypeVar
 
-from .step_result import StepResult
+T_in = TypeVar('T_in')
+T_out = TypeVar('T_out')
 
-class Step(ABC):
+class Step(ABC, Generic[T_in, T_out]):
   """
   Defines the contract for any executable step in an AtelierFlow pipeline.
 
@@ -13,7 +14,7 @@ class Step(ABC):
   """
 
   @abstractmethod
-  def run(self, input_data: Optional[StepResult], experiment_config: Dict[str, Any]) -> StepResult:
+  def run(self, input_data: T_in, experiment_config: Dict[str, Any]) -> T_out:
     """
     Executes the main logic of the step.
 

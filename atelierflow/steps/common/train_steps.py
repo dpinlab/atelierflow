@@ -1,18 +1,28 @@
 from atelierflow.core.model import Model
 from typing import Any, Dict, Optional
-from atelierflow.core.step_result import StepResult
 import logging
 from atelierflow.core.step import Step
+import numpy as np
+from dataclasses import dataclass
 
+@dataclass
+class TrainingData:
+    X: np.ndarray
+    y: np.ndarray
 
+@dataclass
+class TrainedModelResult:
+    model: Model
+    train_time: float
 
-class TrainNestedValidationModelStep(Step):
+# 2. O Step usando os tipos definidos acima
+class TrainNestedValidationModelStep(Step[TrainingData, TrainedModelResult]):
     def __init__(self, model: Model):
-      self.model = model
+        self.model = model
 
-    def run(self, input_data: Optional[StepResult], experiment_config: Dict[str, Any]) -> StepResult:
-      if not input_data: 
-        raise ValueError("TrainModelStep requires input data.")
-      
-      X_train, y_train = input_data.X, input_data.y
-      logging.info(f"Fitting model '{self.model.__class__.__name__}'...")
+    def run(self, input_data: TrainingData, experiment_config: Dict[str, Any]) -> TrainedModelResult:
+        X_train, y_train = input_data.X, input_data.y
+        
+        logging.info(f"Fitting model '{self.model.__class__.__name__}'...")
+        
+        return TrainedModelResult(model=self.model, train_time=10.5)

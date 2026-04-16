@@ -1,18 +1,33 @@
+from dataclasses import dataclass
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 import copy
 import numpy as np
 from sklearn.model_selection import KFold
-import gc # Import the garbage collector
+import gc 
 
 from atelierflow.core.model import Model
 from atelierflow.core.metric import Metric
 from atelierflow.core.step import Step
-from atelierflow.core.step_result import StepResult
+from atelierflow.steps.mtsa.preprocessing.load_and_split_data import SplitDataResult
 
 logger = logging.getLogger(__name__)
 
-class UnsupervisedCrossValidationStep(Step):
+
+@dataclass
+class MetricCVResult:
+    scores: List[float]
+    mean: float
+    std: float
+    artifacts: List[Dict[str, Any]]
+
+@dataclass
+class CrossValidationResult:
+    cv_metrics: Dict[str, MetricCVResult]
+    X_test: np.ndarray
+    y_test: np.ndarray
+
+class UnsupervisedCrossValidationStep(Step[SplitDataResult, CrossValidationResult]):
   """
   Performs cross-validation for an unsupervised model.
 
@@ -25,7 +40,7 @@ class UnsupervisedCrossValidationStep(Step):
     self.metrics = metrics
     self.n_splits = n_splits
 
-  def run(self, input_data: Optional[StepResult], experiment_config: Dict[str, Any]):
+  def run(self, input_data: SplitDataResult, experiment_config: Dict[str, Any]) -> CrossValidationResult:
     X_train = input_data.X_train
     y_train = input_data.y_train 
     X_test = input_data.X_test
@@ -52,7 +67,7 @@ class UnsupervisedCrossValidationStep(Step):
       predictions_or_scores = model_for_fold.predict(X_test)
       
       for metric in self.metrics:
-        result = metric.compute(y_true=y_test, y_pred=predictions_or_scores)
+        result = metric.compute(y_true=y_test, y_score=predictions_or_scores)
         
         score = None
         artifacts = {} 
@@ -82,9 +97,8 @@ class UnsupervisedCrossValidationStep(Step):
       }
       logger.info(f"Final {name}: {np.mean(scores):.4f} +/- {np.std(scores):.4f}")
 
-    result = StepResult(
+    return CrossValidationResult(
       cv_metrics=final_metrics,
       X_test=X_test,
       y_test=y_test
     )
-    return result

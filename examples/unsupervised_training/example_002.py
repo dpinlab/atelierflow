@@ -33,9 +33,9 @@ class AucRocMetric(Metric):
   def __init__(self, name):
     self.name=name
 
-  def compute(self, **kwargs) -> float:
+  def compute(self, y_true, y_score) -> float:
     from sklearn.metrics import roc_curve, auc
-    fpr, tpr, thresholds = roc_curve(kwargs)
+    fpr, tpr, thresholds = roc_curve(y_true, y_score)
     
     roc_auc = auc(fpr, tpr)
     
@@ -47,7 +47,7 @@ class AucRocMetric(Metric):
     return roc_auc, artifacts
   
 # --- 1. Configuration ---
-DATA_DIRECTORY = "/data/marcelo/atelierflow/examples/sample_data/machine_type_1/id_00"
+DATA_DIRECTORY = "/home/celin/Desktop/codes/lab/atelierflow/examples/sample_data/machine_type_1/id_00"
 OUTPUT_FILE = "./anomaly_detection_results.avro"
 
 model_component = MyIForest()  

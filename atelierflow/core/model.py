@@ -1,24 +1,22 @@
-from abc import ABC, abstractmethod
+from typing import Protocol, runtime_checkable
 
-class Model(ABC):
+@runtime_checkable
+class Model(Protocol):
   """
-  Defines the contract for any machine learning model.
+  Defines the structural contract for any machine learning model.
 
-  This class is a pure "component," decoupled from the pipeline logic.
-  Its sole responsibility is to encapsulate an ML algorithm.
+  This is a pure "component" that decouples the ML algorithm from the 
+  pipeline logic, allowing for seamless integration of any class that 
+  implements 'fit' and 'predict'.
   """
 
-
-  @abstractmethod
   def fit(self, X, y=None, **kwargs):
     """
     Trains the model with the provided data.
     """
-    raise NotImplementedError("Subclasses must implement this method.")
-
-  @abstractmethod
+    ...
   def predict(self, X, **kwargs):
     """
     Performs predictions on new data after the model has been trained.
     """
-    raise NotImplementedError("Subclasses must implement this method.")
+    ...

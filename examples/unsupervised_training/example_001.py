@@ -59,24 +59,12 @@ class TrainingResult:
 class EvaluationResult:
   evaluation_scores: Dict[str, float]
 
-class MyIForest(Model):
-  def __init__(self, **kwargs):
-    self.model = IForest(**kwargs)
 
-  def fit(self, X):
-    self.model.fit(X)
-
-  def predict(self, X):
-    return self.model.predict(X)
-
-  def score_samples(self, X):
-    return self.model.score_samples(X)
-
-class AucRocMetric(Metric):
+class AucRocMetric():
   def __init__(self, name):
     self.name = name
 
-  def compute(self, y_true, y_pred) -> float:
+  def compute(self, y_true, y_pred):
     from sklearn.metrics import roc_auc_score
     return float(roc_auc_score(y_true, y_pred))
 
@@ -109,7 +97,7 @@ class EvaluateModelStep(Step[TrainingResult, EvaluationResult]):
 
   def run(self, input_data: TrainingResult, experiment_config: Dict[str, Any]) -> EvaluationResult:
     logging.info("Making predictions on the test set...")
-    y_pred = input_data.model.score_samples(input_data.X_test)
+    y_pred = input_data.model.predict(input_data.X_test)
     scores = {}
     for metric in self.metrics:
       score = metric.compute(input_data.y_test, y_pred)
@@ -117,7 +105,7 @@ class EvaluateModelStep(Step[TrainingResult, EvaluationResult]):
     return EvaluationResult(evaluation_scores=scores)
 
 
-model_component = MyIForest()
+model_component = IForest()
 metric_component = AucRocMetric(name="AUC-ROC")
 
 iforest_experiment = Experiment(name="Isolation Forest Anomaly Detection", logging_level="INFO")

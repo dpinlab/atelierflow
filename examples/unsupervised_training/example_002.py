@@ -7,6 +7,7 @@ sys.path.append(str(project_root))
 # For this example, we use the mtsa package.
 
 from mtsa.models import IForest
+import argparse
 
 from atelierflow.experiment import Experiment
 from atelierflow.core.metric import Metric
@@ -14,6 +15,28 @@ from atelierflow.core.model import Model
 from atelierflow.steps.common.save_data.save_to_avro import SaveToAvroStep
 from atelierflow.steps.mtsa.preprocessing.load_and_split_data import LoadAndSplitDataStep
 from atelierflow.steps.sklearn.validation.cross_validation import UnsupervisedCrossValidationStep
+
+
+DATA_DIRECTORY = project_root / "examples" / "sample_data" / "machine_type_1" / "id_00"
+OUTPUT_FILE = "./anomaly_detection_results.avro"
+
+parser = argparse.ArgumentParser(description='MTSA anomaly detection using pre-built steps.',)
+parser.add_argument(
+    '-d', '--data-dir', 
+    type=str, 
+    default=str(DATA_DIRECTORY), 
+    metavar="DIR", 
+    help="Path to the machine ID directory (e.g., .../machine_type_1/id_00/). "
+         "Must contain 'normal' and 'abnormal' subfolders."
+)
+parser.add_argument(
+    '-o', '--output', 
+    type=str, 
+    default=OUTPUT_FILE, 
+    metavar="FILE", 
+    help="Path to save the output Avro file containing experiment metrics."
+)
+args = parser.parse_args()
 
 # --- Components ---
 class MyIForest(Model):
@@ -47,8 +70,6 @@ class AucRocMetric(Metric):
     return roc_auc, artifacts
   
 # --- 1. Configuration ---
-DATA_DIRECTORY = "/home/celin/Desktop/codes/lab/atelierflow/examples/sample_data/machine_type_1/id_00"
-OUTPUT_FILE = "./anomaly_detection_results.avro"
 
 model_component = MyIForest()  
 metric_component = AucRocMetric(name="AUC-ROC")
@@ -56,7 +77,7 @@ metric_component = AucRocMetric(name="AUC-ROC")
 # --- 2. Pipeline Assembly ---
 iforest_experiment = Experiment(name="Isolation Forest Anomaly Detection", logging_level="INFO")
 
-iforest_experiment.add_step(LoadAndSplitDataStep(directory=DATA_DIRECTORY))
+iforest_experiment.add_step(LoadAndSplitDataStep(directory=str(DATA_DIRECTORY)))
 iforest_experiment.add_step(UnsupervisedCrossValidationStep(model=model_component, metrics=[metric_component]))
 
 scores_schema = {

@@ -4,8 +4,12 @@ import numpy as np
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
+import argparse
+
+# For this example, we use the mtsa package.
 
 project_root = Path(__file__).resolve().parents[2]
+
 sys.path.append(str(project_root))
 
 from mtsa.models import IForest
@@ -15,6 +19,28 @@ from atelierflow.core.metric import Metric
 from atelierflow.core.model import Model
 from atelierflow.core.step import Step
 from atelierflow.steps.common.save_data.save_to_avro import SaveToAvroStep
+
+
+DATA_DIRECTORY = project_root / "examples" / "sample_data" / "machine_type_1" / "id_00"
+OUTPUT_FILE = "./anomaly_detection_results.avro"
+
+parser = argparse.ArgumentParser(description='MTSA anomaly detection: Isolation Forest example.',)
+parser.add_argument(
+    '-d', '--data-dir', 
+    type=str, 
+    default=str(DATA_DIRECTORY), 
+    metavar="DIR", 
+    help="Path to the machine ID directory (e.g., .../machine_type_1/id_00/). "
+         "Must contain 'normal' and 'abnormal' subfolders."
+)
+parser.add_argument(
+    '-o', '--output', 
+    type=str, 
+    default=OUTPUT_FILE, 
+    metavar="FILE", 
+    help="Path to save the output Avro file containing experiment metrics."
+)
+args = parser.parse_args()
 
 @dataclass
 class SplitDataResult:
@@ -90,15 +116,13 @@ class EvaluateModelStep(Step[TrainingResult, EvaluationResult]):
       scores[metric.__class__.__name__] = score
     return EvaluationResult(evaluation_scores=scores)
 
-DATA_DIRECTORY = "/home/celin/Desktop/codes/lab/atelierflow/examples/sample_data/machine_type_1/id_00"
-OUTPUT_FILE = "./anomaly_detection_results.avro"
 
 model_component = MyIForest()
 metric_component = AucRocMetric(name="AUC-ROC")
 
 iforest_experiment = Experiment(name="Isolation Forest Anomaly Detection", logging_level="INFO")
 
-iforest_experiment.add_step(LoadAndSplitDataStep(directory=DATA_DIRECTORY))
+iforest_experiment.add_step(LoadAndSplitDataStep(directory=str(args.d)))
 iforest_experiment.add_step(TrainModelStep(model=model_component))
 iforest_experiment.add_step(EvaluateModelStep(metrics=[metric_component]))
 
@@ -113,7 +137,7 @@ scores_schema = {
 
 iforest_experiment.add_step(
     SaveToAvroStep(
-        output_path=OUTPUT_FILE,
+        output_path=args.o,
         data_key='evaluation_scores',
         schema=scores_schema
     )

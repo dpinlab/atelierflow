@@ -1,18 +1,17 @@
-from abc import ABC, abstractmethod
+from typing import Protocol, runtime_checkable
 
-class Metric(ABC):
+@runtime_checkable
+class Metric(Protocol):
   """
-  Defines the contract for a performance evaluation metric.
-
-  This is a pure "component" used by evaluation steps to produce
-  a numerical score.
-  """
-  def __init__(self, name: str):
-    self.name = name
+  Structural interface for performance evaluation metrics.
   
-  @abstractmethod
-  def compute(self, **kwargs) -> float:
+  Any class implementing the `compute` method is considered a valid Metric,
+  allowing for flexible integration of custom scoring logic.
+  """
+  name: str
+  
+  def compute(self, **kwargs):
     """
-    Computes the metric and returns a single numerical value (float).
+    Computes the metric.
     """
-    raise NotImplementedError("Subclasses must implement the 'compute' method.")
+    ...

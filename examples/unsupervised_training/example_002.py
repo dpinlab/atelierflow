@@ -9,31 +9,16 @@ sys.path.append(str(project_root))
 from mtsa.models import IForest
 
 from atelierflow.experiment import Experiment
-from atelierflow.core.metric import Metric
-from atelierflow.core.model import Model
 from atelierflow.steps.common.save_data.save_to_avro import SaveToAvroStep
 from atelierflow.steps.mtsa.preprocessing.load_and_split_data import LoadAndSplitDataStep
 from atelierflow.steps.sklearn.validation.cross_validation import UnsupervisedCrossValidationStep
 
 # --- Components ---
-class MyIForest(Model):
-  def __init__(self, **kwargs):
-    self.model = IForest(**kwargs)
-
-  def fit(self, X, y=None):
-    self.model.fit(X, y)
-
-  def predict(self, X):
-    return self.model.predict(X)
-
-  def score_samples(self, X):
-    return self.model.score_samples(X)
-  
-class AucRocMetric(Metric):
+class AucRocMetric():
   def __init__(self, name):
     self.name=name
 
-  def compute(self, y_true, y_score) -> float:
+  def compute(self, y_true, y_score):
     from sklearn.metrics import roc_curve, auc
     fpr, tpr, thresholds = roc_curve(y_true, y_score)
     
@@ -50,7 +35,7 @@ class AucRocMetric(Metric):
 DATA_DIRECTORY = "/home/celin/Desktop/codes/lab/atelierflow/examples/sample_data/machine_type_1/id_00"
 OUTPUT_FILE = "./anomaly_detection_results.avro"
 
-model_component = MyIForest()  
+model_component = IForest()  
 metric_component = AucRocMetric(name="AUC-ROC")
 
 # --- 2. Pipeline Assembly ---

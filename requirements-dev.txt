@@ -3,3 +3,4 @@ fastavro
 torch
 mtsa
 scikit-learn
+mlflow

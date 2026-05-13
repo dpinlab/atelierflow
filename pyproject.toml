@@ -29,11 +29,13 @@ torch = ["torch"]
 mtsa = ["mtsa"]
 sklearn = ["scikit-learn"]
 tensorflow = ["tensorflow"]
+mlflow = ["mlflow"]
 all = [
   "atelierflow[torch]",
   "atelierflow[sklearn]",
   "atelierflow[tensorflow]",
   "atelierflow[mtsa]",
+  "atelierflow[mlflow]",
 ]
 
 [project.urls]

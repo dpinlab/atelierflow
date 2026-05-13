@@ -10,3 +10,4 @@ dist/
 
 *.avro
 .DS_Store
+.envrc
